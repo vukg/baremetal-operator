@@ -73,7 +73,7 @@ func (a *iLO5AccessDetails) DriverInfo(bmcCreds Credentials) map[string]interfac
 }
 
 func (a *iLO5AccessDetails) BootInterface() string {
-	return "ilo-ipxe"
+	return "ilo-uefi-https"
 }
 
 func (a *iLO5AccessDetails) ManagementInterface() string {
