@@ -35,6 +35,7 @@ var (
 	softPowerOffTimeout       = time.Second * 180
 	deployKernelURL           string
 	deployRamdiskURL          string
+	deployBootloaderURL       string
 	deployISOURL              string
 	ironicEndpoint            string
 	inspectorEndpoint         string
@@ -86,9 +87,10 @@ func NewMacAddressConflictError(address, node string) error {
 func loadConfigFromEnv() error {
 	deployKernelURL = os.Getenv("DEPLOY_KERNEL_URL")
 	deployRamdiskURL = os.Getenv("DEPLOY_RAMDISK_URL")
+	deployBootloaderURL = os.Getenv("DEPLOY_BOOTLOADER_URL")
 	deployISOURL = os.Getenv("DEPLOY_ISO_URL")
-	if deployISOURL == "" && (deployKernelURL == "" || deployRamdiskURL == "") {
-		return errors.New("Either DEPLOY_KERNEL_URL and DEPLOY_RAMDISK_URL or DEPLOY_ISO_URL must be set")
+	if deployISOURL == "" && (deployKernelURL == "" || deployRamdiskURL == "" || deployBootloaderURL == "") {
+		return errors.New("Either DEPLOY_KERNEL_URL and DEPLOY_RAMDISK_URL and DEPLOY_BOOTLOADER_URL or DEPLOY_ISO_URL must be set")
 	}
 	if (deployKernelURL == "" && deployRamdiskURL != "") || (deployKernelURL != "" && deployRamdiskURL == "") {
 		return errors.New("DEPLOY_KERNEL_URL and DEPLOY_RAMDISK_URL can only be set together")
@@ -188,6 +190,7 @@ func LogStartup() {
 		"inspectorAuthType", inspectorAuth.Type,
 		"deployKernelURL", deployKernelURL,
 		"deployRamdiskURL", deployRamdiskURL,
+		"deployBootloaderURL", deployBootloaderURL,
 		"deployISOURL", deployISOURL,
 	)
 }
@@ -519,8 +522,9 @@ func (p *ironicProvisioner) ValidateManagementAccess(data provisioner.Management
 	// FIXME(dhellmann): We need to get our IP on the
 	// provisioning network from somewhere.
 	if deployKernelURL != "" && deployRamdiskURL != "" {
-		driverInfo["deploy_kernel"] = deployKernelURL
-		driverInfo["deploy_ramdisk"] = deployRamdiskURL
+		driverInfo["ilo_deploy_kernel"] = deployKernelURL
+		driverInfo["ilo_deploy_ramdisk"] = deployRamdiskURL
+		driverInfo["ilo_bootloader"] = deployBootloaderURL
 	}
 	if deployISOURL != "" {
 		driverInfo["deploy_iso"] = deployISOURL
